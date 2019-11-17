@@ -110,13 +110,17 @@ def fPublish(exchange = None, queue = None, routingKey = None, content = None):
                     rbmqChannel.queue_declare(
                         queue=routingKey, 
                         durable=True,
+                        auto_delete=False,
+                        exclusive=False,
                         arguments={'x-message-ttl' : var["rbmqQTTL"]}
                     )
                     publish = rbmqChannel.basic_publish(
                         exchange='',
                         routing_key=routingKey,
                         body=contentJSON,
-                        properties=pika.BasicProperties(delivery_mode = var["rbmqDeliveryMode"])
+                        properties=pika.BasicProperties(
+                                        delivery_mode = var["rbmqDeliveryMode"],
+                                    )
                         )
                 except Exception as e:
                     logM = "Errors RabbitMQ publish: %s" % str(e)

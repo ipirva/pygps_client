@@ -19,8 +19,9 @@ rDistanceCritical: 0.01
 # rbmq credentials
 rbmqUsername: pygps
 rbmqPassword: a!-BEWY4_%S7vBc
-# queue ttl, ms - the queue needs to be recreated
-rbmqQTTL: 3600000
+# queue/messssage ttl, ms
+# 5 days
+rbmqQTTL: 432000000
 # msg delivery mode, 2 - persistent
 rbmqDeliveryMode: 2
 # time between 2 executions of the app, in seconds

@@ -166,6 +166,16 @@ def fConsumeCallback(ch, method, properties, body):
         else:
             logM = "The message is not to be published."
             fWriteLog(callId, var["loggingFilePath"], var["logLevelsShow"],  fName, logM, "error")
+            # requeue message
+            try:
+                ch.basic_nack(delivery_tag = method.delivery_tag, requeue=True)
+            except Exception as e:
+                logM = "Cannot requeue message %s: %s" % (str(method.delivery_tag), str(e))
+                fWriteLog(callId, var["loggingFilePath"], var["logLevelsShow"],  fName, logM, "error")
+            else:
+                logM = "The message is requeued %s." % str(method.delivery_tag)
+                fWriteLog(callId, var["loggingFilePath"], var["logLevelsShow"],  fName, logM, "error")
+
 
 def fCheckJSON(jstr = None, jschema = None):
     """
