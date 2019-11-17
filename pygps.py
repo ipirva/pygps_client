@@ -114,28 +114,33 @@ def fPublish(exchange = None, queue = None, routingKey = None, content = None):
                         exclusive=False,
                         arguments={'x-message-ttl' : var["rbmqQTTL"]}
                     )
-                    publish = rbmqChannel.basic_publish(
-                        exchange='',
-                        routing_key=routingKey,
-                        body=contentJSON,
-                        properties=pika.BasicProperties(
-                                        delivery_mode = var["rbmqDeliveryMode"],
-                                    )
-                        )
                 except Exception as e:
-                    logM = "Errors RabbitMQ publish: %s" % str(e)
+                    logM = "Errors RabbitMQ Q declare: %s" % str(e)
                     fWriteLog(callId, var["loggingFilePath"], var["logLevelsShow"],  fName, logM, "critical")
-                    result["publish"] = 0
-                    result["error"] = logM
                 else:
-                    if publish:
-                        # publish returns TRUE
-                        result["publish"] = 1
-                    else:
-                        # publish return FALSE
+                    try:
+                        publish = rbmqChannel.basic_publish(
+                            exchange='',
+                            routing_key=routingKey,
+                            body=contentJSON,
+                            properties=pika.BasicProperties(
+                                            delivery_mode = var["rbmqDeliveryMode"],
+                                        )
+                            )
+                    except Exception as e:
+                        logM = "Errors RabbitMQ publish: %s" % str(e)
+                        fWriteLog(callId, var["loggingFilePath"], var["logLevelsShow"],  fName, logM, "critical")
                         result["publish"] = 0
-                finally:
-                    rbmqConn.close()
+                        result["error"] = logM
+                    else:
+                        if publish:
+                            # publish returns TRUE
+                            result["publish"] = 1
+                        else:
+                            # publish return FALSE
+                            result["publish"] = 0
+                    finally:
+                        rbmqConn.close()
             else:
                 result["error"] = "The Exchange value is not correct."
                 logM = "Errors: %s" % str(result["error"])
