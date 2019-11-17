@@ -1,0 +1,9 @@
+---
+apiGetIPURL: "https://api6.ipify.org?format=json"
+# which log levels to write to file
+logLevelsShow: ["info", "warning", "critical", "debug", "error"]
+# comment and the script dir and scriptname.log are to be chosen by default
+# loggingFilePath: ""
+# file path
+filePath: "/tmp/.ipaddress"
+...

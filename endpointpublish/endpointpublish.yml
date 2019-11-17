@@ -1,0 +1,10 @@
+---
+JWTEndpointURL: ""
+APIURL: ""
+APIEndpoint: "/track/items/"
+APIRootCAPath: "certificates/ca-crt.pem"
+APICertificatePath: "certificates/clientA-crt.pem"
+APIPrivateKeyPath: "certificates/clientA-key.pem"
+# ip address
+ipAddressFilePath: "/tmp/.ipaddress"
+...

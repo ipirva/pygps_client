@@ -1,0 +1,14 @@
+---
+# ip address
+ipAddressFilePath: "/tmp/.ipaddress"
+# logging file
+# comment and the script dir and scriptname.log are to be chosen by default
+# loggingFilePath: ""
+# rbmq credentials
+rbmqUsername: pygps
+rbmqPassword: a!-BEWY4_%S7vBc
+# rbmq queue
+queue: GPSDetails
+# which log levels to write to file
+logLevelsShow: ["info", "warning", "critical", "debug", "error"]
+...

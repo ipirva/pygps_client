@@ -1,0 +1,34 @@
+---
+# serial port
+serialIF: "/dev/serial0"
+serialSpeed: 115200
+serialTimeout: 1
+# logging file
+# comment and the script dir and scriptname.log are to be chosen by default
+# loggingFilePath: ""
+# which log levels to write to file
+logLevelsShow: ["info", "warning", "critical", "debug", "error"]
+# even if there is no move, publish every 15 seconds
+# int
+# recommandation publishInterval more than 2 * interExec
+publishInterval: 15
+# critical distance in Km, publish if the distance is >= rDistanceCritical
+# float 
+# 0.0 for example
+rDistanceCritical: 0.01
+# rbmq credentials
+rbmqUsername: pygps
+rbmqPassword: a!-BEWY4_%S7vBc
+# queue ttl, ms - the queue needs to be recreated
+rbmqQTTL: 3600000
+# msg delivery mode, 2 - persistent
+rbmqDeliveryMode: 2
+# time between 2 executions of the app, in seconds
+# int
+interExec: 5
+# default values, not valid per se
+# do not change
+lato: 1000
+lono: 1000
+timeUTCo: 20181202182023
+...

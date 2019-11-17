@@ -1,0 +1,8 @@
+requests
+pyyaml
+jsonschema
+pymemcache
+pika
+uuid
+ipaddress
+python-crontab
