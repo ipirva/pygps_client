@@ -99,6 +99,9 @@ systemctl daemon-reload
 
 systemctl start pygps.service
 systemctl start pygps-consumer.service
+
+journalctl -u pygps.service
+journalctl -u pygps-consumer.service
 ```
 
 **Log rotate**
@@ -108,16 +111,16 @@ cd /etc/logrotate.d/
 
 **pygps**
 ```
-/home/[SCRIPT]/pygps/pygps-consumer.log
-/home/[SCRIPT]/pygps/pygps.log
-/home/[SCRIPT]/pygps/cron/getipaddress.log
+/home/[SCRIPT]/pygps/logs/pygps-consumer.log
+/home/[SCRIPT]/pygps/logs/pygps.log
+/home/[SCRIPT]/pygps/cron/logs/getipaddress.log
 {
-	rotate 12
+	rotate 30
 	maxsize 50M
 	notifempty
 	missingok
 	nocreate
-	weekly
+	daily
 	compress
 	delaycompress
 }
@@ -225,7 +228,7 @@ service rabbitmq-server start
             "durable": true,
             "auto_delete": false,
             "arguments": {
-                "x-message-ttl": 3600000
+                "x-message-ttl": 432000000
             }
         }
     ],
