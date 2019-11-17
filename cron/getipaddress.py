@@ -333,7 +333,7 @@ if __name__ == '__main__':
     try:
         var["loggingFilePath"]
     except Exception as e:
-        logPath = _scriptDir+"/"+_nameBase+".log"
+        logPath = _scriptDir+"/logs/"+_nameBase+".log"
 
     try:
         apiURL = var["apiGetIPURL"]

@@ -607,7 +607,7 @@ if __name__ == "__main__":
         try:
             var["loggingFilePath"]
         except Exception as e:
-            var["loggingFilePath"] = _scriptDir+"/"+_nameBase+".log"
+            var["loggingFilePath"] = _scriptDir+"/logs/"+_nameBase+".log"
 
         try:
             fileHandle = open(var["loggingFilePath"], "a+")
