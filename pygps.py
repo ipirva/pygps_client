@@ -639,8 +639,14 @@ if __name__ == "__main__":
         fWriteLog(callId, var["loggingFilePath"], var["logLevelsShow"],  "Main", logM, "debug")
         # mark
         iterate = 1
-        time.sleep(int(var["interExec"]))
+        # sleep between consecutive executions - one read every sleepTime
+        deltaTime = int(var["interExec"]) - int(mainExecTime)
+        if deltaTime > int(var["interExec"]):
+            sleepTime = int(var["interExec"])
+        else:
+            sleepTime = deltaTime
+        time.sleep(sleepTime)
         # log the time between two executions
         endExec = time.perf_counter()
-        logM = "Time: consecutive executions: %f seconds" % float(endExec - end)
+        logM = "Time: add btw consecutive executions: %f seconds" % float(endExec - end)
         fWriteLog(callId, var["loggingFilePath"], var["logLevelsShow"],  "Main", logM, "debug")

@@ -24,7 +24,7 @@ rbmqPassword: a!-BEWY4_%S7vBc
 rbmqQTTL: 432000000
 # msg delivery mode, 2 - persistent
 rbmqDeliveryMode: 2
-# time between 2 executions of the app, in seconds
+# time to wait between 2 executions of the app, in seconds
 # int
 interExec: 5
 # default values, not valid per se
