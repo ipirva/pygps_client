@@ -27,6 +27,13 @@ Raspbian GNU/Linux 9
 All the files are installed in /home/[SCRIPT]/pygps  
 PYGPS will run as user [SCRIPT]
 
+#### Test:
+
+```
+cd endpointpublis/certificates
+token=$(curl --key clientA-key.pem --cert clientA-crt.pem --cacert ca-crt.pem https://[JWT API ENDPOINT]/get/jwt/ -H 'x-ip-address: xxx' -H 'Content-Type: application/json' | jq -r '.token'); curl -X POST -i https://[API GW]/track/items/ -H "Authorization: Bearer ${token}" -H "X-DEBUG: true" -H 'x-ip-address: xxx'
+```
+
 #### Prerequisites:
 
 Packages: python3 (3.7.x), pip3, pip-tools, systemd, git, rabbitmq-server, memcached

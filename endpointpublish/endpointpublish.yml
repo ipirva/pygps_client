@@ -1,6 +1,6 @@
 ---
-JWTEndpointURL: "https://jwt.endpoint.api-proxy.local.home.p2o.be:1443/get/jwt/"
-APIURL: "https://gravitee-gw.local.home.p2o.be"
+JWTEndpointURL: "https://jwt.endpoint.api-proxy.home.p2o.be:1443/get/jwt/"
+APIURL: "https://gravitee-gw.home.p2o.be"
 APIEndpoint: "/track/items/"
 APIRootCAPath: "certificates/ca-crt.pem"
 APICertificatePath: "certificates/clientA-crt.pem"
