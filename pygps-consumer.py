@@ -52,6 +52,9 @@ msgJSONSchema = {
                 "rDestinationLon": {
                     "type": "number"
                 },
+                "_rDistance": {
+                    "type": "number"
+                },
                 "rDistance": {
                     "$ref": "#/definitions/RDistance"
                 },
@@ -96,6 +99,7 @@ msgJSONSchema = {
                 "rAltitude",
                 "rDestinationLat",
                 "rDestinationLon",
+                "_rDistance",
                 "rDistance",
                 "rOriginLat",
                 "rOriginLon",

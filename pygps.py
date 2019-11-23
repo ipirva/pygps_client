@@ -466,6 +466,8 @@ def main():
         destination = (float(rGPSValues["latitude"]), float(rGPSValues["longitude"]), int(float(rGPSValues["UTCtimedate"])))
         
         rDistance = fDistance(None, destination)
+        _rDistance = rDistance["distance"]
+
         rOriginLat = float(lato)
         rOriginLon = float(lono)
         rOriginTimeUTC = int(timeUTCo)
@@ -499,6 +501,7 @@ def main():
             "rAltitude": rAltitude,
             "rUTC": rUTC,
             "rSpeed": rSpeed,
+            "_rDistance": _rDistance,
             "rDistance": rDistance,
             "rStatusGPS": rStatusGPS,
             "rGLONASSsattelitesUsed": rGLONASSsattelitesUsed,
@@ -528,6 +531,7 @@ def main():
     if rView is None:
         rView = dict()
         rDistance = {"distance": 0.0, "cdistance": var["rDistanceCritical"], "units": "Km"}
+        _rDistance = 0.0
         # {"publish": {"conn": 1, "error": "", "publish": 3}, "rAltitude": 30.073, "rDestinationLat": xxx, "rDestinationLon": xxx, "rDistance": {"distance": 0.0, "units": "Km"}, "rOriginLat": xxx, "rOriginLon": xxx, "rOriginTimeUTC": 20181205214617, "rSpeed": 0.0, "rStatusGPS": "Location 3D Fix", "rUTC": 20181205214625}
         rView = {
             "rOriginLat": 1000,
@@ -538,6 +542,7 @@ def main():
             "rAltitude": 0.0,
             "rUTC": timeUTCo,
             "rSpeed": 0.0,
+            "_rDistance": _rDistance,
             "rDistance": rDistance,
             "rStatusGPS": rStatusGPS,
             "rGLONASSsattelitesUsed": 0,
@@ -568,8 +573,8 @@ def main():
     # publish = 2 is done because of forced action
     # publish = 3 is done periodically, if no previous condition triggered
     if publish["publish"] > 0:
-        rView["publish"] = dict()
-        rView["publish"]["publish"] = publish["publish"]
+        # rView["publish"] = dict()
+        rView["publish"] = publish["publish"]
         rPublish = fPublish(None, None, "GPSDetails", rView)
         try:
             publish["conn"] = rPublish["conn"]

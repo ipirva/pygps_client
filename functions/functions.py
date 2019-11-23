@@ -93,10 +93,10 @@ def fJSONZip(msg: dict = None) -> dict:
         # key = "base64(zip(o))"
         try:
             #{'msgid': '', 'rAltitude': , 'publish': , 'rDestinationLat': , 'rGNSSSsattelitesinView': '', 
-            # 'rGNSSSsattelitesUsed': '', 'rOriginLon': , 'rDistance': , 'rUTC': , 'rGLONASSsattelitesUsed': '', 'rOriginTimeUTC': , \
+            # 'rGNSSSsattelitesUsed': '', 'rOriginLon': , '_rDistance':, 'rDistance': , 'rUTC': , 'rGLONASSsattelitesUsed': '', 'rOriginTimeUTC': , \
             #'rDestinationLon': , 'rStatusGPS': '', 'rSpeed': , 'rOriginLat': , 'uptime': , 'publicIPAddress': , 'hostname': }
             # map keys
-            newKeys = {'msgid': 'a', 'rAltitude': 'b', 'publish': 'c', 'rDestinationLat': 'd', 'rGNSSSsattelitesinView': 'e', 'rGNSSSsattelitesUsed': 'f', 'rOriginLon': 'g', 'rDistance': 'h', 'rUTC': 'i', 'rGLONASSsattelitesUsed': 'k', 'rOriginTimeUTC': 'l', 'rDestinationLon': 'm', 'rStatusGPS': 'n', 'rSpeed': 'o', 'rOriginLat': 'p', 'uptime': 'r', 'publicIPAddress': 's', 'hostname': 't'}
+            newKeys = {'msgid': 'a', 'rAltitude': 'b', 'publish': 'c', 'rDestinationLat': 'd', 'rGNSSSsattelitesinView': 'e', 'rGNSSSsattelitesUsed': 'f', 'rOriginLon': 'g', '_rDistance': 'h', 'rDistance': 'i', 'rUTC': 'k', 'rGLONASSsattelitesUsed': 'l', 'rOriginTimeUTC': 'm', 'rDestinationLon': 'n', 'rStatusGPS': 'o', 'rSpeed': 'p', 'rOriginLat': 'q', 'uptime': 'r', 'publicIPAddress': 's', 'hostname': 't'}
             newMsg = dict([(newKeys.get(k), v) for k, v in msg.items()])
             msgZip = base64.b64encode(
                         zlib.compress(
