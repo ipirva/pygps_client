@@ -152,7 +152,7 @@ def fGetPublicIP(ipAddressFilePath: str = None) -> str:
         fileHandle = open(ipAddressFilePath, "r")
         variables = yaml.load(fileHandle, Loader=yaml.FullLoader)
     except Exception as e:
-        error[errId] = "Cannot open the file path or its content is not YAML: %s"%(str(e))
+        error[errId] = "Cannot open the file path %s or its content is not YAML: %s"%(str(ipAddressFilePath), str(e))
         errId += 1
     else:
         try:

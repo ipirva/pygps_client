@@ -65,8 +65,8 @@ Type=simple
 ExecStart=/usr/bin/python3 /home/[SCRIPT]/pygps/pygps.py
 Restart=always
 RestartSec=3
-StandardOutput=file:/var/log/pygps_stdout.log
-StandardError=file:/var/log/pygps_stderr.log
+StandardOutput=journal
+StandardError=journal
 
 [Install]
 WantedBy=multi-user.target
@@ -86,29 +86,48 @@ Type=simple
 ExecStart=/usr/bin/python3 /home/[SCRIPT]/pygps/pygps-consumer.py
 Restart=always
 RestartSec=3
-StandardOutput=file:/var/log/pygps-consumer_stdout.log
-StandardError=file:/var/log/pygps-consumer_stderr.log
+StandardOutput=journal
+StandardError=journal
 
 [Install]
 WantedBy=multi-user.target
 Alias=pygps-consumer.service
 ```
 
+**pygps-ipaddress.service**
 ```
-touch /var/log/pygps_stdout.log
-touch /var/log/pygps_stderr.log
-touch /var/log/pygps-consumer_stdout.log
-touch /var/log/pygps-consumer_stderr.log
+[Unit]
+Description=Python GPS Service IP Req
+After=network.target
+
+[Service]
+User=ipirva
+Group=ipirva
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/usr/local/bin/python3.7 /home/[SCRIPT]/pygps/cron/getipaddress.py
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+Alias=pygps-ipaddress.service
 ```
 
 ```
 systemctl daemon-reload
 
+systemctl enable pygps.service
+systemctl enable pygps-consumer.service
+systemctl enable pygps-ipaddress.service
+
 systemctl start pygps.service
 systemctl start pygps-consumer.service
+systemctl start pygps-ipaddress.service
 
 journalctl -u pygps.service
 journalctl -u pygps-consumer.service
+journalctl -u pygps-ipaddress.service
 ```
 
 **Log rotate**
