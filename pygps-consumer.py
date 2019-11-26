@@ -250,7 +250,7 @@ def fProcessMsg(msg = None):
                 # message available - publish 1 (distance), 2 (forced - like when system re/starts) or 3 (beacon if no movement)
                 # {'rGNSSSsattelitesinView': 11, 'rOriginLat': xxx, 'rOriginLon': xxx, 'msgid': 'd64cab02f56afe6750288e47cfa44245', 
                 # 'rDistance': {'units': 'Km', 'distance': 0.0, 'cdistance': 0.01}, \
-                # 'rAltitude': xxx, 'rStatusGPS': 'Location 3D Fix', 'publish': {'publish': 3}, 'rUTC': 20191010221837, 
+                # 'rAltitude': xxx, 'rStatusGPS': 'Location 3D Fix', 'rLastFixTimestampUTC': '', 'rLastGPSFix': '', 'publish': {'publish': 3}, 'rUTC': 20191010221837, 
                 # 'rOriginTimeUTC': 20191010221830, 'rDestinationLat': xxx, 'rGLONASSsattelitesUsed': '', \
                 # 'rGNSSSsattelitesUsed': '10', 'rSpeed': 0.0, 'rDestinationLon': xxx}
                 #
@@ -258,7 +258,7 @@ def fProcessMsg(msg = None):
                 # "rDestinationLon": 1000, "rDistance": {"cdistance": 0.01, \
                 # "distance": 0.0, "units": "Km"}, "rGLONASSsattelitesUsed": 0, "rGNSSSsattelitesUsed": 0, "rGNSSSsattelitesinView": 0, 
                 # "rOriginLat": 1000, "rOriginLon": 1000, "rOriginTimeUTC": 20181202182023, "rSpeed": 0.0, \
-                # "rStatusGPS": "Unknown: []", "rUTC": 20181202182023}
+                # "rStatusGPS": "Unknown: []", 'rLastFixTimestampUTC': '', 'rLastGPSFix': '', "rUTC": 20181202182023}
                 # we got one message; what do we do with it?
                 # call method
                 # Get JWT Token
