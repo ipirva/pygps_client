@@ -79,6 +79,13 @@ msgJSONSchema = {
                 "rStatusGPS": {
                     "type": "string"
                 },
+                "rLastGPSFix": {
+                    "type": "string"
+                },
+                "rLastFixTimestampUTC": {
+                    "type": "integer",
+                    "minimum": 20181202182023
+                },
                 "msgid": {
                     "type": "string"
                 },
@@ -107,6 +114,8 @@ msgJSONSchema = {
                 "rSpeed",
                 "rUTC", 
                 "rStatusGPS",
+                "rLastGPSFix",
+                "rLastFixTimestampUTC",
                 "msgid",
                 "rGLONASSsattelitesUsed",
                 "rGNSSSsattelitesUsed",
@@ -160,7 +169,7 @@ def fConsumeCallback(ch, method, properties, body):
         if responseProcessMsg is not None:
             try:
                 # ack message
-                ch.basic_ack(delivery_tag = method.delivery_tag)
+                ch.basic_ack(delivery_tag = method.delivery_tag, multiple = False)
             except Exception as e:
                 logM = "Cannot ACK message %s: %s" % (str(method.delivery_tag), str(e))
                 fWriteLog(callId, var["loggingFilePath"], var["logLevelsShow"],  fName, logM, "error")
@@ -315,12 +324,14 @@ def fConsume(queue = None):
         except Exception as e:
             logM = "Errors RabbitMQ connect: %s" % str(e)
             fWriteLog(callId, var["loggingFilePath"], var["logLevelsShow"],  fName, logM, "critical")
+            rbmqConn.close()
         else:
             logM = "Connected to queue %s!" % queue
             fWriteLog(callId, var["loggingFilePath"], var["logLevelsShow"],  fName, logM, "debug")
 
             try:
                 rbmqChannel = rbmqConn.channel()
+                #rbmqChannel.basic_qos(prefetch_count=100)
                 rbmqChannel.basic_consume(
                     queue,
                     fConsumeCallback,
@@ -330,11 +341,12 @@ def fConsume(queue = None):
             except Exception as e:
                 logM = "Error RabbitMQ consume: %s" % str(e)
                 fWriteLog(callId, var["loggingFilePath"], var["logLevelsShow"],  fName, logM, "critical")
+                rbmqConn.close()
             else:
                 logM = "Connected to queue %s and ready to consume!" % queue
                 fWriteLog(callId, var["loggingFilePath"], var["logLevelsShow"],  fName, logM, "info")
 
-            rbmqConn.close()
+            # rbmqConn.close()
     else:
         logM = "Got no valid queue name!"
         fWriteLog(callId, var["loggingFilePath"], var["logLevelsShow"],  fName, logM, "critical")

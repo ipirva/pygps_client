@@ -7,4 +7,8 @@ APICertificatePath: "certificates/clientA-crt.pem"
 APIPrivateKeyPath: "certificates/clientA-key.pem"
 # ip address
 ipAddressFilePath: "/tmp/.ipaddress"
+# jwt cache
+jwtCacheFilePath: "cache/.jwt"
+# jwt considered expired 10s before the actual exp time
+jwtCacheBuffer: 10
 ...

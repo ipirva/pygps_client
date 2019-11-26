@@ -6,3 +6,6 @@ pika
 uuid
 ipaddress
 python-crontab
+pyjwt
+uptime
+pyserial

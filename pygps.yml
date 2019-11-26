@@ -32,4 +32,6 @@ interExec: 5
 lato: 1000
 lono: 1000
 timeUTCo: 20181202182023
+# cache file
+cacheFilePath: "cache/.lastfix"
 ...

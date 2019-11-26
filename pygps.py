@@ -44,7 +44,6 @@ def fMcdb():
     else:
         return mcdbClient
 
-
 def fPublish(exchange = None, queue = None, routingKey = None, content = None):
     """
     publish a message to a specific RabbitMQ exchange / queue
@@ -303,6 +302,8 @@ def fGetGPS():
     callId = str(uuid.uuid1())
 
     global lato, lono, timeUTCo, latd, lond, timeUTCd, rStatusGPS
+
+    timeUTCo = ""
     
     # get a list with matched values return by the serial read
     outputGPS = []
@@ -311,6 +312,8 @@ def fGetGPS():
     GPSValues = {}
     # GNSS navigation information parsed from NMEA sentences
     rSerial = fReadSerial(cmd = "AT+CGNSPWR=1 \r\n"+"AT+CGNSINF \r\n"+"AT+CGPSSTATUS? \r\n")
+    # logM = "Serial read result: "+rSerial
+    # fWriteLog(callId, var["loggingFilePath"], var["logLevelsShow"],  fName, logM, "debug")
     if rSerial is not None:
         matchGPS1 = re.compile("\+CGNSINF: ([0-9,\.]+)", re.IGNORECASE)
         outputGPS = matchGPS1.findall(rSerial)
@@ -402,7 +405,6 @@ def fGetGPS():
                         logM = "Cannot connect to memcachedb."
                         fWriteLog(callId, var["loggingFilePath"], var["logLevelsShow"],  fName, logM, "critical")
                         #return None
-
                     return GPSValues
                 else:
                     logM = "GPS does not have a fix status yet."
@@ -450,7 +452,6 @@ def main():
             )
         except Exception as e:
             deltaTime = 0
-       
     # publish results
     publish = {}
     # publish based on criteria: distance, timer, forced (at start)
@@ -476,7 +477,9 @@ def main():
         rAltitude = float(rGPSValues["mslAltitude"])
         rSpeed = float(rGPSValues["speed"])
         rUTC = int(float(rGPSValues["UTCtimedate"]))
-        
+
+        rStatusGPS = rGPSValues["rStatusGPSLocation"]
+
         if len(rGPSValues["GLONASSsattelitesUsed"]) == 0:
             rGLONASSsattelitesUsed = 0
         else:
@@ -491,6 +494,35 @@ def main():
             rGNSSSsattelitesinView = 0
         else:
             rGNSSSsattelitesinView = int(rGPSValues["GNSSSsattelitesinView"])
+        
+        # handle cache
+        # store last valid fix status
+        # lastFixType, lastFixTimestampUTC
+        validGPSFix = ["Location 2D Fix","Location 3D Fix"]
+        lastFixType = "NA"
+        lastFixTimestampUTC = 0
+
+        if rStatusGPS in validGPSFix:
+            vars = dict()
+            vars["lastFixType"] = str(rStatusGPS)
+            vars["lastFixTimestampUTC"] = rUTC
+            writeCacheVars = fCacheVars(vars, var["cacheFilePath"], "write")
+            logM = str(writeCacheVars)
+            fWriteLog(callId, var["loggingFilePath"], var["logLevelsShow"],  "Main", logM, "debug")
+            lastFixType = str(rStatusGPS)
+            lastFixTimestampUTC = rUTC
+        else:
+            # get last fix state and timestamp
+            readCacheVars = fCacheVars(None, var["cacheFilePath"], "read")
+            logM = str(readCacheVars)
+            fWriteLog(callId, var["loggingFilePath"], var["logLevelsShow"], "Main", logM, "debug")
+            if "vars" in readCacheVars.keys():
+                try:
+                    lastFixType = readCacheVars["vars"]["lastFixType"]
+                    lastFixTimestampUTC = readCacheVars["vars"]["lastFixTimestampUTC"]
+                except:
+                    pass
+
 
         rView = {
             "rOriginLat": rOriginLat,
@@ -504,6 +536,8 @@ def main():
             "_rDistance": _rDistance,
             "rDistance": rDistance,
             "rStatusGPS": rStatusGPS,
+            "rLastGPSFix": lastFixType,
+            "rLastFixTimestampUTC": lastFixTimestampUTC,
             "rGLONASSsattelitesUsed": rGLONASSsattelitesUsed,
             "rGNSSSsattelitesUsed": rGNSSSsattelitesUsed,
             "rGNSSSsattelitesinView": rGNSSSsattelitesinView
@@ -545,6 +579,8 @@ def main():
             "_rDistance": _rDistance,
             "rDistance": rDistance,
             "rStatusGPS": rStatusGPS,
+            "rLastGPSFix": lastFixType,
+            "rLastFixTimestampUTC": lastFixTimestampUTC,
             "rGLONASSsattelitesUsed": 0,
             "rGNSSSsattelitesUsed": 0,
             "rGNSSSsattelitesinView": 0
@@ -600,6 +636,7 @@ if __name__ == "__main__":
     while True:
         from functions.functions import fLoadVars
         from functions.functions import fWriteLog
+        from functions.functions import fCacheVars
         #
         callId = str(uuid.uuid1())
         # epoch
@@ -613,6 +650,13 @@ if __name__ == "__main__":
             var["loggingFilePath"]
         except Exception as e:
             var["loggingFilePath"] = _scriptDir+"/logs/"+_nameBase+".log"
+
+        try:
+            var["cacheFilePath"]
+        except Exception as e:
+            var["cacheFilePath"] = None
+        else:
+            var["cacheFilePath"] = _scriptDir+"/"+var["cacheFilePath"]
 
         try:
             fileHandle = open(var["loggingFilePath"], "a+")

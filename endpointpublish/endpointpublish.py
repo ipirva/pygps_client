@@ -3,6 +3,7 @@
 
 import json, os, uuid, time, sys
 import requests
+import jwt
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
@@ -57,6 +58,8 @@ def fGetJWT() -> dict:
     returnMessage['token'] = None
     returnMessage['ipAddress'] = None
 
+    returnMessage['cache'] = True
+
     callId = str(uuid.uuid1())
     start = time.perf_counter()
     
@@ -73,6 +76,10 @@ def fGetJWT() -> dict:
         APIPrivateKeyPath = _scriptDir+"/"+var["APIPrivateKeyPath"]
 
         ipAddressFilePath = var["ipAddressFilePath"]
+        
+        jwtCacheFilePath = _scriptDir+"/"+var["jwtCacheFilePath"]
+        jwtCacheBuffer = var["jwtCacheBuffer"]
+
     except Exception as e:
         error[errId] = "Cannot load the var files or a specific var is not defined: %s" %str(e)
         errId += 1
@@ -92,45 +99,111 @@ def fGetJWT() -> dict:
 
     apiGETHeaders = {'X-IP-Address': ipAddress}
 
-    # get HTTP
+    # read jwt from cache
+    cacheJWT = None
+    timeDelta = 0
     try:
-        apiGetResponse = fRequestsRetrySession().get(
-                    JWTEndpointURL,
-                    cert=(APICertificatePath, APIPrivateKeyPath),
-                    verify=APIRootCAPath,
-                    headers=apiGETHeaders, timeout=(2,5)
-                )
+        with open(jwtCacheFilePath, 'r') as hdlCacheJWT:
+            cacheJWT = str(hdlCacheJWT.read())
     except Exception as e:
-        error[errId] = "HTTP GET JWT returned the following error: %s" %str(e)
+        error[errId] = "Cannot read cached JWT from %s: %s" %(str(jwtCacheFilePath),str(e))
         errId += 1
     else:
-        success[successId] = "HTTP GET JWT API call completed successfully"
+        success[successId] = "Can read cached JWT from %s." %(str(jwtCacheFilePath))
         successId += 1
-        httpCode = apiGetResponse.status_code
-
-        if httpCode == 200:
-            try:
-                apiGetResponse = json.loads(apiGetResponse.content.decode('utf-8'))
-            except Exception as e:
-                error[errId] = "Cannot decode HTTP GET JWT API response: %s" %str(e)
-                errId += 1
+        try:
+            # decode without verify it
+            cacheJWTDecode = jwt.decode(cacheJWT, verify=False)
+        except Exception as e:
+            error[errId] = "Cannot decode cached JWT %s from %s: %s" %(str(cacheJWT),str(jwtCacheFilePath),str(e))
+            errId += 1
+        else:
+            success[successId] = "Can decode cached JWT from %s." %(str(jwtCacheFilePath))
+            successId += 1
+            token = cacheJWT
+            if type(cacheJWTDecode) == dict:
+                if "exp" in cacheJWTDecode.keys():
+                    try:
+                        timeDelta = int(cacheJWTDecode["exp"]) - int(time.time())
+                    except Exception as e:
+                        error[errId] = "Cannot calculate cached JWT %s remaining lifetime: %s" %(str(cacheJWTDecode),str(e))
+                        errId += 1
+                    else:
+                        success[successId] = "Cached JWT remaining lifetime %s." %(str(timeDelta))
+                        successId += 1
+                else:
+                    error[errId] = "Cannot find exp key in the decoded cached JWT %s" %(str(cacheJWTDecode))
+                    errId += 1
             else:
-                success[successId] = "HTTP GET JWT API call returned response: %s" %str(httpCode)
-                successId += 1
-                # get the token out of the response
+                error[errId] = "Decoded cached JWT %s does look mode like a %s than a dict." %(str(cacheJWTDecode),str(type(cacheJWTDecode)))
+                errId += 1
+
+
+    if timeDelta == 0 or timeDelta < jwtCacheBuffer or timeDelta < 0:
+        # cached JWT is nearly expired
+        cacheJWT = None
+        error[errId] = "Cached JWT is expired"
+        errId += 1
+
+
+    if cacheJWT is None:
+        returnMessage['cache'] = False
+        # get HTTP
+        try:
+            apiGetResponse = fRequestsRetrySession().get(
+                        JWTEndpointURL,
+                        cert=(APICertificatePath, APIPrivateKeyPath),
+                        verify=APIRootCAPath,
+                        headers=apiGETHeaders, timeout=(2,5)
+                    )
+        except Exception as e:
+            error[errId] = "HTTP GET JWT returned the following error: %s" %str(e)
+            errId += 1
+        else:
+            success[successId] = "HTTP GET JWT API call completed successfully"
+            successId += 1
+            httpCode = apiGetResponse.status_code
+
+            if httpCode == 200:
                 try:
-                    token = apiGetResponse["token"]
+                    apiGetResponse = json.loads(apiGetResponse.content.decode('utf-8'))
                 except Exception as e:
-                    error[errId] = "Cannot get the token from the HTTP GET JWT API response: %s" %str(e)
+                    error[errId] = "Cannot decode HTTP GET JWT API response: %s" %str(e)
                     errId += 1
                 else:
-                    success[successId] = "HTTP GET JWT API call returned a token: %s" %str(token)
+                    success[successId] = "HTTP GET JWT API call returned response: %s" %str(httpCode)
                     successId += 1
-                    returnMessage['token'] = token
-
-        else:
-            error[errId] = "HTTP GET JWT API call returned response %s" %str(httpCode)
-            errId += 1
+                    # get the token out of the response
+                    try:
+                        token = apiGetResponse["token"]
+                    except Exception as e:
+                        error[errId] = "Cannot get the token from the HTTP GET JWT API response: %s" %str(e)
+                        errId += 1
+                    else:
+                        try:
+                            jwt.decode(token, verify=False)
+                        except Exception as e:
+                            error[errId] = "Cannot decode received token %s: %s" %(str(token), str(e))
+                            errId += 1
+                        else:
+                            success[successId] = "HTTP GET JWT API call returned an JWT token: %s" %str(token)
+                            successId += 1
+                            # write to cache
+                            try:
+                                with open(jwtCacheFilePath, 'w+') as hdlCacheJWT:
+                                    hdlCacheJWT.write(token)
+                            except Exception as e:
+                                error[errId] = "Cannot write token to cache %s: %s" %(str(jwtCacheFilePath), str(e))
+                                errId += 1
+                            else:
+                                success[successId] = "JWT token cached to: %s" %str(jwtCacheFilePath)
+                                successId += 1
+            else:
+                # HTTP get JWT returned HTTP code other than 200
+                error[errId] = "HTTP GET JWT API call returned response %s" %str(httpCode)
+                errId += 1
+    
+    returnMessage['token'] = token
 
     elapsed = time.perf_counter() - start; metrics['elapsed'] = round(elapsed,5)
 
