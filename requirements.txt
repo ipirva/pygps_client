@@ -4,28 +4,54 @@
 #
 #    pip-compile requirements.in
 #
---extra-index-url https://www.piwheels.org/simple
-
-attrs==19.3.0             # via jsonschema
-certifi==2019.9.11        # via requests
-chardet==3.0.4            # via requests
-idna==2.8                 # via requests
-importlib-metadata==0.23  # via jsonschema
+attrs==19.3.0
+    # via jsonschema
+certifi==2019.9.11
+    # via requests
+chardet==3.0.4
+    # via requests
+idna==2.8
+    # via requests
+importlib-metadata==0.23
+    # via jsonschema
 ipaddress==1.0.23
+    # via -r requirements.in
 jsonschema==3.1.1
-more-itertools==7.2.0     # via zipp
+    # via -r requirements.in
+more-itertools==7.2.0
+    # via zipp
 pika==1.1.0
+    # via -r requirements.in
 pyjwt==1.7.1
+    # via -r requirements.in
 pymemcache==2.2.2
-pyrsistent==0.15.5        # via jsonschema
+    # via -r requirements.in
+pyrsistent==0.15.5
+    # via jsonschema
+pyserial==3.5
+    # via -r requirements.in
 python-crontab==2.4.0
-python-dateutil==2.8.1    # via python-crontab
+    # via -r requirements.in
+python-dateutil==2.8.1
+    # via python-crontab
 pyyaml==5.1.2
+    # via -r requirements.in
 requests==2.22.0
-six==1.13.0               # via jsonschema, pymemcache, pyrsistent, python-dateutil
-urllib3==1.25.7           # via requests
+    # via -r requirements.in
+six==1.13.0
+    # via
+    #   jsonschema
+    #   pymemcache
+    #   pyrsistent
+    #   python-dateutil
+uptime==3.0.1
+    # via -r requirements.in
+urllib3==1.25.8
+    # via requests
 uuid==1.30
-zipp==0.6.0               # via importlib-metadata
+    # via -r requirements.in
+zipp==0.6.0
+    # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
-# setuptools==42.0.1        # via jsonschema
+# setuptools
